@@ -52,7 +52,7 @@ def main():
     print("EGRESS CANDIDATE CREATED")
     print(f"Export folder: {export_dir.resolve()}")
     print(f"Bundle: {bundle.resolve()}")
-    print("This does not authorise egress; submit through the TRE disclosure process.")
+    print("This does not authorise egress; submission is done through the TRE disclosure process.")
 
 
 if __name__ == "__main__":
