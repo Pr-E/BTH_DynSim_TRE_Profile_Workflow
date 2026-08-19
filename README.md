@@ -144,9 +144,6 @@ python scripts/prepare_egress.py \
   --round-base <APPROVED_ROUNDING_BASE>
 ```
 
-The output ZIP remains an egress candidate and must follow the approved TRE
-disclosure process.
-
 ## Outside the TRE
 
 DynSim should consume the approved `portable_metadata.json`, generate
