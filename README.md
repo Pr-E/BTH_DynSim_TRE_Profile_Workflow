@@ -1,4 +1,4 @@
-## BTH Dynamic Simulator TRE Profile Workflow
+## BTH Dynamic Simulator (DynSim) TRE Profile Workflow
 
 This repository contains the **TRE-side EDA and calibration workflow** used to profile the BTH source datasets before downstream synthetic data generation.
 
