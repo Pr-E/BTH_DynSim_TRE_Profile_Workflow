@@ -1,4 +1,4 @@
-# DynSim TRE EDA + Calibration v1.3
+# DynSim TRE EDA + Calibration v1.0
 
 This is the TRE-side workflow for DynSim.
 
