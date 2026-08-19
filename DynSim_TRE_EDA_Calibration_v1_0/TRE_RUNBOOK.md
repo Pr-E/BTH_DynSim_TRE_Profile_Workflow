@@ -58,11 +58,7 @@ python scripts/prepare_egress.py \
   --round-base <APPROVED_ROUNDING_BASE>
 ```
 
-## 7. Submit through normal output checking
-
-Do not export `metadata_profiles/internal`.
-
-## 8. External workflow
+## 7. External workflow
 
 Use the approved aggregate metadata to calibrate DynSim, generate synthetic
 tables, develop the full analytical workflow outside the TRE, then run the
