@@ -1,6 +1,6 @@
 # DynSim TRE EDA + Calibration v1.3
 
-This is the lean TRE-side workflow for DynSim.
+This is the TRE-side workflow for DynSim.
 
 It deliberately follows the same pattern as the earlier six-table TRE EDA:
 
