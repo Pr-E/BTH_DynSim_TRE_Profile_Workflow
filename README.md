@@ -1,145 +1,157 @@
-# DynSim Generic TRE Profiler v1
+# DynSim TRE EDA + Calibration v1.3
 
-This package is the TRE-side metadata profiling component for DynSim.
+This is the TRE-side workflow for DynSim.
 
-Its purpose is to inspect source tables inside a secure environment and create
-aggregate structural/statistical metadata that can later used by DynSim outside the TRE.
+It deliberately follows the same pattern as the earlier six-table TRE EDA:
 
-## Design rule
+```text
+TRE source tables
+      ↓
+EDA / structural discovery
+      ↓
+statistical + temporal + relationship findings
+      ↓
+machine-readable aggregate profile
+      ↓
+TRE disclosure review
+      ↓
+approved aggregate metadata
+      ↓
+DynSim outside the TRE
+```
 
-There are **no project-specific patient counts, schemas, column names, date
-ranges, category probabilities, table relationships or pathway rules embedded
-in the Python profiler**.
 
-The profiler discovers these characteristics from the source tables.
+## No hard-coded findings
 
-The only configuration values are generic profiling controls such as type
-detection thresholds and maximum numbers of candidate columns to explore.
+The repository does **not** contain the observed row counts, patient counts,
+distributions, date ranges, overlap counts, utilisation rates or other
+statistical findings from the TRE.
 
-## What it accepts
+Source tables are discovered at runtime. Candidate keys and cross-table patient
+linkage are resolved from the data itself.
 
-The command-line workflow currently discovers:
+The code contains only generic EDA logic and structural concepts such as
+"spell/episode-like", "ED-like" and "pathway-like" table detection.
 
-- CSV
-- Parquet
-- Feather
+## What the EDA captures
 
-The Python package works on pandas DataFrames internally, so database/query
-adapters can be added without changing the profiling logic.
+### Common structure
+- raw rows and columns
+- exact duplicates
+- fully blank rows
+- schema, dtype, missingness and cardinality
+- resolved patient/event keys
 
-## What it produces
+### Pathway-like tables
+- referral/row burden per patient
+- full count distribution
+- repeat-referral gaps
+- referral → first event timing
+- first → last timing
+- chronology QA
 
-The internal aggregate profile contains:
+### Inpatient-like tables
+- spell nesting within patient
+- episodes per spell
+- spells per patient
+- full event-count distributions
+- spell-level LOS
+- admission/discharge and episode chronology QA
+- numbered clinical-slot occupancy
 
-- `tables.csv` — dimensions, missing cells, duplicates, blank rows
-- `columns.csv` — schema, dtype, inferred type, missingness, uniqueness
-- `identifier_candidates.csv` — automatically detected identifier-like columns
-- `numeric.csv` — aggregate numeric summaries
-- `categorical.csv` — aggregate category counts/proportions
-- `datetime.csv` — aggregate date coverage
-- `identifier_burden.csv` — rows per identifier candidate
-- `within_table_links.csv` — candidate parent/child nesting behaviour
-- `cross_table_links.csv` — aggregate overlap between candidate identifiers
-- `temporal_intervals.csv` — aggregate intervals between detected dates
-- `repeat_gaps.csv` — aggregate repeat-event gaps
-- `slot_occupancy.csv` — automatically detected numbered-field occupancy
-- `portable_metadata.json` — consolidated generic DynSim metadata object
-- `manifest.json`
+### ED-like tables
+- patient/event composite-key QA
+- attendance-level deduplicated view
+- attendances per patient
+- full attendance-count distribution
+- arrival/departure timing
+- repeat-attendance gaps
+- numbered clinical-slot occupancy
 
-No source rows and no identifier values are written into these outputs.
+### Calibration used across tables
+- numeric distribution shape: mean, SD, variance, skewness, kurtosis and quantiles
+- categorical distributions
+- top-N + `__OTHER__` for high-cardinality categorical/code fields
+- datetime coverage
+- monthly/yearly/day-of-week/hour seasonality
+- within-patient consistency
+- row/pairwise missingness structure
+- Pearson/Spearman numeric dependencies
+- Cramér's V categorical dependencies
+- strongest categorical joint/conditional distributions
+- cross-table patient overlap and coverage
 
-## TRE workflow
-
-From the repository root:
+## Run inside the TRE
 
 ```bash
-python scripts/run_tre_profile.py \
+python scripts/run_tre_eda_calibration.py \
   --input /project/readonly \
   --output metadata_profiles/internal
 ```
 
-Validate:
+Then:
 
 ```bash
 python scripts/validate_profile.py \
   --profile metadata_profiles/internal
 ```
 
-Review the aggregate files against the exploratory analysis already performed
-inside the TRE.
+Review the outputs against the findings from the earlier TRE EDA before
+preparing anything for egress.
 
-Only after that review, confirm the applicable disclosure-control rules
-with the TRE output-checking team. The profiler does not assume a minimum
-cell-count threshold or rounding rule. These values are supplied only when an
-egress candidate is prepared:
+## Aggregate outputs
+
+The workflow writes:
+
+```text
+eda_table_inventory.csv
+eda_schema.csv
+eda_keys.csv
+eda_count_summaries.csv
+eda_count_distributions.csv
+eda_numeric.csv
+eda_categorical.csv
+eda_dates.csv
+eda_intervals.csv
+eda_temporal_qa.csv
+eda_slot_occupancy.csv
+eda_seasonality.csv
+eda_within_patient_consistency.csv
+eda_row_missingness.csv
+eda_missingness_pairs.csv
+eda_missingness_patterns.csv
+eda_numeric_correlations.csv
+eda_categorical_associations.csv
+eda_categorical_joint.csv
+eda_cross_table_relationships.csv
+portable_metadata.json
+manifest.json
+```
+
+`portable_metadata.json` is the consolidated DynSim calibration contract.
+
+## Egress
+
+Do not use a hard-coded disclosure threshold.
+
+After the TRE output-checking team confirms the applicable rules:
 
 ```bash
 python scripts/prepare_egress.py \
   --internal metadata_profiles/internal \
   --export metadata_profiles/export \
   --min-cell-count <APPROVED_THRESHOLD> \
-  --round-base <APPROVED_ROUNDING_BASE> \
-  --date-granularity month
+  --round-base <APPROVED_ROUNDING_BASE>
 ```
 
-This creates:
+The output ZIP remains an egress candidate and must follow the approved TRE
+disclosure process.
 
-```text
-metadata_profiles/DynSim_Aggregate_Profile_EGRESS_CANDIDATE.zip
-```
+## Outside the TRE
 
-The ZIP is only a candidate for disclosure review. The script does not move
-anything out of the TRE and does not replace the TRE's approval process.
+DynSim should consume the approved `portable_metadata.json`, generate
+low-fidelity synthetic tables with comparable structure and calibration, and
+support development of the ingestion/cleaning/preprocessing/analysis workflow.
 
-## What leaves the TRE after approval
-
-The intended egress object is the disclosure-reviewed aggregate profile,
-especially `portable_metadata.json` plus the supporting aggregate CSVs.
-
-DynSim outside the TRE should use that metadata as its source of truth instead
-of hard-coded project values.
-
-## Why identifier discovery is automatic
-
-Different projects use different identifier names. The profiler therefore
-scores identifier candidates using generic signals:
-
-- identifier-like naming
-- uniqueness ratio
-- missingness
-
-It then profiles potential relationships without exporting any identifier
-values.
-
-Cross-table relationships are discovered by comparing candidate identifier
-sets **inside the TRE** and writing only aggregate overlap counts and coverage.
-
-## Important governance boundary
-
-The `internal` profile can contain unsuppressed aggregate counts, detailed summary
-statistics and exact date bounds. It should remain inside the TRE.
-
-`prepare_egress.py` applies configurable small-cell suppression, optional count
-rounding and date-bound generalisation before creating an egress candidate.
-
-
-## Disclosure-control behaviour
-
-The export step is deliberately separate from profiling. It is not a claim that
-the generated profile is automatically safe to release.
-
-Before creating an egress candidate, obtain the applicable local TRE output
-rules. The export transform can then:
-
-- suppress positive counts below the approved threshold
-- suppress derived percentages when their supporting count is unsafe
-- suppress full summary rows when the contributing `n` is unsafe, so statistics
-  such as mean, median, quantiles, minimum and maximum do not survive after a
-  small supporting count is suppressed
-- collapse small categorical cells into an `__OTHER_OR_SUPPRESSED__` group
-- suppress the collapsed category if it is still below the approved threshold
-- optionally round count fields
-- generalise date bounds to year, month or day
-
-The resulting ZIP remains an **egress candidate only** and must still go through
-the normal TRE disclosure/output-checking process before export.
+The completed workflow can then be translated back into the TRE with the same
+expected table grain, keys, temporal structures and relationships.
