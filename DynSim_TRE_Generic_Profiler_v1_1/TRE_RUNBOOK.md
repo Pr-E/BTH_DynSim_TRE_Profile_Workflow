@@ -84,8 +84,6 @@ metadata_profiles/DynSim_Aggregate_Profile_EGRESS_CANDIDATE.zip
 
 through the normal TRE disclosure process.
 
-Do not export the `internal` folder.
-
 ## 8. Outside the TRE
 
 After approval, place the aggregate ZIP with the external DynSim development
