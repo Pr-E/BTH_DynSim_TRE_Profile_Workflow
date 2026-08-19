@@ -142,4 +142,4 @@ rules. The export transform can then:
 - generalise date bounds to year, month or day
 
 The resulting ZIP remains an **egress candidate only** and must still go through
-the normal TRE disclosure/output-checking process.
+the normal TRE disclosure/output-checking process before export.
