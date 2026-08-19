@@ -1,0 +1,25 @@
+{
+  "discovery": {
+    "extensions": [
+      ".csv",
+      ".parquet",
+      ".feather"
+    ],
+    "datetime_parse_threshold": 0.8,
+    "identifier_min_score": 2.0,
+    "max_identifier_candidates": 8
+  },
+  "eda": {
+    "make_plots": false,
+    "top_n": 30,
+    "categorical_full_max_unique": 100,
+    "max_dependency_numeric_columns": 16,
+    "max_dependency_categorical_columns": 12,
+    "max_dependency_levels": 20,
+    "min_pairwise_n": 20,
+    "max_joint_dependency_pairs": 8,
+    "min_cramers_v_for_joint_profile": 0.05,
+    "max_missingness_columns": 20,
+    "max_missingness_patterns": 50
+  }
+}
