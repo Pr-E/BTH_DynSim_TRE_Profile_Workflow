@@ -2,7 +2,7 @@
 
 This is the TRE-side workflow for DynSim.
 
-It deliberately follows the same pattern as the earlier six-table TRE EDA:
+Follows the same pattern as the six-table TRE EDA:
 
 ```text
 TRE source tables
@@ -19,9 +19,6 @@ approved aggregate metadata
       ↓
 DynSim outside the TRE
 ```
-
-The important change is that the EDA findings are now captured as structured
-aggregate outputs instead of existing only as terminal print-outs.
 
 ## No hard-coded findings
 
@@ -138,9 +135,7 @@ manifest.json
 
 ## Egress
 
-Do not use a hard-coded disclosure threshold.
-
-After the TRE output-checking team confirms the applicable rules:
+Using the approved TRE disclosure threshold:
 
 ```bash
 python scripts/prepare_egress.py \
@@ -150,36 +145,11 @@ python scripts/prepare_egress.py \
   --round-base <APPROVED_ROUNDING_BASE>
 ```
 
-The output ZIP remains an egress candidate and must follow the approved TRE
-disclosure process.
-
 ## Outside the TRE
 
 DynSim should consume the approved `portable_metadata.json`, generate
 low-fidelity synthetic tables with comparable structure and calibration, and
-support development of the ingestion/cleaning/preprocessing/analysis workflow.
+support development of the ingestion/cleaning/preprocessing/analysis workflow for the Active Blackpool/BTH project.
 
 The completed workflow can then be translated back into the TRE with the same
 expected table grain, keys, temporal structures and relationships.
-
-
-## Anomaly capture
-
-The workflow records aggregate data-quality structure rather than relying on a
-project-specific anomaly list:
-
-- per-column missingness
-- row-level missingness burden
-- pairwise joint missingness
-- common missingness patterns
-- exact duplicate rows and fully blank rows
-- key-integrity/cardinality findings
-- date-parse failures and chronology violations
-- negative and zero interval counts
-- isolated early/late calendar years
-- extreme numeric values using a robust-IQR rule
-- within-patient inconsistencies
-- cross-table linkage/coverage QA
-
-`eda_anomaly_candidates.csv` contains candidates for review and synthetic
-calibration. A candidate is not automatically labelled clinically invalid.
