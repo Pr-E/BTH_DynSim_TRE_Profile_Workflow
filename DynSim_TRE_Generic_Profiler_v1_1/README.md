@@ -3,8 +3,7 @@
 This package is the TRE-side metadata profiling component for DynSim.
 
 Its purpose is to inspect source tables inside a secure environment and create
-aggregate structural/statistical metadata that can later be reviewed for
-disclosure and used by DynSim outside the TRE.
+aggregate structural/statistical metadata that can later used by DynSim outside the TRE.
 
 ## Design rule
 
