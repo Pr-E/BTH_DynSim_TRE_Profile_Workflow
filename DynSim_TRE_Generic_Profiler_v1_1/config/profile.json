@@ -1,0 +1,22 @@
+{
+  "discovery": {
+    "include_extensions": [".csv", ".parquet", ".feather"],
+    "exclude_name_startswith": ["_", "."],
+    "sample_rows_for_type_detection": 5000,
+    "datetime_parse_threshold": 0.80,
+    "categorical_max_unique": 100,
+    "categorical_max_unique_ratio": 0.05,
+    "free_text_mean_length_threshold": 50,
+    "free_text_unique_ratio_threshold": 0.20,
+    "identifier_max_candidates_per_table": 8,
+    "identifier_min_score": 2.0,
+    "cross_table_min_overlap": 1,
+    "max_datetime_columns_for_pairwise_intervals": 12,
+    "max_identifier_columns_for_repeat_gaps": 3
+  },
+  "output": {
+    "write_internal_csv": true,
+    "write_manifest": true,
+    "write_portable_metadata": true
+  }
+}
