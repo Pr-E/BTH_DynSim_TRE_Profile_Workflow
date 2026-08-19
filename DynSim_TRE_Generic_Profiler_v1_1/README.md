@@ -122,9 +122,6 @@ statistics and exact date bounds. It should remain inside the TRE.
 `prepare_egress.py` applies configurable small-cell suppression, optional count
 rounding and date-bound generalisation before creating an egress candidate.
 
-The final decision on what may leave the TRE belongs to the TRE disclosure
-process.
-
 
 ## Disclosure-control behaviour
 
